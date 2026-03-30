@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>StudentMate - CGPA Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 60px;
+            background: #0f172a;
+            border-bottom: 1px solid #1e293b;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #cbd5e1;
+            margin-left: 30px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: #3b82f6;
+        }
+
+        /* MAIN SECTION */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px;
+        }
+
+        .box {
+            background: rgba(30, 41, 59, 0.9);
+            width: 100%;
+            max-width: 750px;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .box h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .input-group {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        input {
+            padding: 10px 14px;
+            margin: 6px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            width: 140px;
+            font-size: 14px;
+            background: #0f172a;
+            color: white;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border-radius: 40px;
+            border: none;
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(37,99,235,0.4);
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-3px);
+        }
+
+        #result {
+            margin-top: 25px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 18px;
+            color: #3b82f6;
+        }
+
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            text-decoration: none;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 768px){
+            header{
+                padding: 20px;
+            }
+
+            nav a{
+                margin-left: 15px;
+                font-size: 14px;
+            }
+
+            .box{
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🎓 StudentMate</div>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="cgp.html">CGPA</a>
+        <a href="input.html">Resume</a>
+        <a href="project_login.html">Projects</a>
+        <a href="login_chat.html">Career</a>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="box">
+        <h2>CGPA Calculator (Credit Based)</h2>
+
+        <div class="input-group">
+            <p>Enter number of subjects:</p>
+            <input type="number" id="num" placeholder="e.g. 5">
+            <br>
+            <button class="btn" onclick="createInputs()">Create Inputs</button>
+        </div>
+
+        <div id="subjects"></div>
+
+        <div style="text-align:center;">
+            <button class="btn" onclick="calculateCGPA()">Calculate CGPA</button>
+        </div>
+
+        <div id="result"></div>
+
+        <a href="index.html" class="back">⬅ Back to Home</a>
+    </div>
+</div>
+
+<script>
+function createInputs() {
+    let n = Number(document.getElementById("num").value);
+    let container = document.getElementById("subjects");
+
+    container.innerHTML = "";
+
+    if (n <= 0) {
+        container.innerHTML = "Please enter a valid number of subjects.";
+        return;
+    }
+
+    for (let i = 1; i <= n; i++) {
+        container.innerHTML += `
+            <div class="row">
+                Subject ${i} :
+                Credit <input type="number" class="credit" placeholder="Credit">
+                Grade Point <input type="number" class="grade" placeholder="Grade Point">
+            </div>
+        `;
+    }
+}
+
+function calculateCGPA() {
+    let credits = document.getElementsByClassName("credit");
+    let grades = document.getElementsByClassName("grade");
+
+    let totalCredits = 0;
+    let totalPoints = 0;
+
+    for (let i = 0; i < credits.length; i++) {
+        let c = Number(credits[i].value);
+        let g = Number(grades[i].value);
+
+        if (c == 0 || g == 0) {
+            document.getElementById("result").innerHTML = "Please fill all credits and grade points.";
+            return;
+        }
+
+        totalCredits += c;
+        totalPoints += c * g;
+    }
+
+    let cgpa = (totalPoints / totalCredits).toFixed(2);
+
+    document.getElementById("result").innerHTML = "Your CGPA is: " + cgpa;
+}
+</script>
+
+</body>
+</html>

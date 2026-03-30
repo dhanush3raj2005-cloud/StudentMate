@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>StudentMate | Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+    }
+
+    .header {
+      text-align: center;
+      padding: 30px 20px;
+      font-size: 26px;
+      font-weight: 700;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 1000px;
+      margin: 20px auto;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px;
+      margin: 20px 0;
+      border-radius: 12px;
+      border: 1px solid #30363d;
+      background: #161b22;
+      color: white;
+      font-size: 14px;
+    }
+
+    .card {
+      background: #161b22;
+      padding: 25px;
+      margin: 20px 0;
+      border-radius: 18px;
+      border: 1px solid #30363d;
+    }
+         .card:hover {
+      transform: translateY(-10px);
+      border-color: #d6780d;
+      box-shadow: 0 15px 30px rgba(241, 140, 7, 0.288);
+         }
+
+
+    .card h3 {
+      margin-bottom: 10px;
+      color: #58a6ff;
+    }
+
+    .info {
+      font-size: 14px;
+      margin: 5px 0;
+      color: #8b949e;
+    }
+
+    .btn {
+      margin-top: 12px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .approve-btn {
+      background: green;
+      color: white;
+      
+    }
+     .approve-btn:hover{
+         transform: translateY(-3px);
+   
+
+     }
+
+    .reject-btn {
+      background: red;
+      color: white;
+    }
+
+    .reject-btn:hover {
+       transform: translateY(-3px);
+
+    }
+
+    .empty {
+      text-align: center;
+      margin-top: 40px;
+      color: gray;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="header">
+  🧑‍💼 Guide – Approve / Reject Projects
+</div>
+
+<div class="container">
+
+  <!-- 🔍 SEARCH BOX -->
+  <input type="text" id="search" class="search-box" placeholder="Search project...">
+
+  <div id="list"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, updateDoc, doc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const config = {
+  apiKey: "AIzaSyCvcwHqg1NdO_VjpdJDwGSDTDF6MBziMdQ",
+  authDomain: "studentmate-project.firebaseapp.com",
+  projectId: "studentmate-project"
+};
+
+const app = initializeApp(config);
+const database = getFirestore(app);
+
+let allProjects = []; // store all data
+
+/* LOAD PROJECTS */
+async function loadProjects() {
+
+    const snapshot = await getDocs(collection(database, "projects"));
+    allProjects = [];
+
+    snapshot.forEach((docItem) => {
+        let p = docItem.data();
+        p.id = docItem.id;
+        allProjects.push(p);
+    });
+
+    displayProjects(allProjects);
+}
+
+/* DISPLAY FUNCTION */
+function displayProjects(data) {
+
+    let html = "";
+    let found = false;
+
+    data.forEach((project) => {
+
+        if (project.status === "pending") {
+
+            found = true;
+
+            html += `
+                <div class="card">
+                    <h3>${project.projectName}</h3>
+                    <div class="info"><strong>Dept No:</strong> ${project.deptNo}</div>
+                    <div class="info"><strong>Guide:</strong> ${project.guideName}</div>
+                    <div class="info"><strong>Frontend:</strong> ${project.frontendTech}</div>
+                    <div class="info"><strong>Backend:</strong> ${project.backendTech}</div>
+                    <div class="info"><strong>Description:</strong> ${project.desc}</div>
+
+                    <button class="btn approve-btn" onclick="approve('${project.id}')">Approve</button>
+                    <button class="btn reject-btn" onclick="reject('${project.id}')">Reject</button>
+                </div>
+            `;
+        }
+
+    });
+
+    if (!found) {
+        html = `<div class="empty">No matching projects 🚀</div>`;
+    }
+
+    document.getElementById("list").innerHTML = html;
+}
+
+/* 🔍 SEARCH FUNCTION */
+document.getElementById("search").addEventListener("input", function() {
+
+    let value = this.value.toLowerCase();
+
+    let filtered = allProjects.filter(p => 
+        p.projectName.toLowerCase().includes(value) ||
+        p.guideName.toLowerCase().includes(value) ||
+        p.deptNo.toLowerCase().includes(value)
+    );
+
+    displayProjects(filtered);
+});
+
+/* APPROVE */
+window.approve = async function(id) {
+    await updateDoc(doc(database, "projects", id), {
+        status: "approved"
+    });
+    loadProjects();
+}
+
+/* REJECT */
+window.reject = async function(id) {
+    await updateDoc(doc(database, "projects", id), {
+        status: "rejected"
+    });
+    loadProjects();
+}
+
+/* START */
+loadProjects();
+
+</script>
+
+</body>
+</html>

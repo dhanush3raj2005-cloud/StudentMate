@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>StudentMate | Project Upload</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+background:#0d1117;
+color:#e6edf3;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+}
+
+.form-box{
+background:#161b22;
+padding:40px 30px;
+width:400px;
+border-radius:20px;
+border:1px solid #30363d;
+box-shadow:0 0 40px rgba(0,0,0,0.6);
+text-align:center;
+}
+
+h2{
+margin-bottom:25px;
+font-weight:600;
+font-size:22px;
+}
+
+input,textarea{
+width:100%;
+padding:12px;
+margin:10px 0;
+border-radius:12px;
+border:1px solid #30363d;
+background:#0d1117;
+color:#e6edf3;
+font-size:14px;
+outline:none;
+}
+
+textarea{
+resize:none;
+height:80px;
+}
+
+button{
+width:100%;
+padding:13px;
+margin-top:15px;
+border:none;
+border-radius:12px;
+background:linear-gradient(90deg,#58a6ff,#8b5cf6);
+color:white;
+font-size:15px;
+font-weight:600;
+cursor:pointer;
+}
+
+#msg{
+margin-top:18px;
+font-size:14px;
+color:#4ade80;
+}
+
+a{
+display:block;
+margin-top:20px;
+text-decoration:none;
+color:#8b949e;
+font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="form-box">
+
+<h2>📁 Upload Project</h2>
+
+<input type="text" id="projectName" placeholder="Project Name">
+<input type="text" id="deptNo" placeholder="Department No">
+<input type="text" id="guideName" placeholder="Guide Name">
+<input type="text" id="frontendTech" placeholder="Frontend Technology">
+<input type="text" id="backendTech" placeholder="Backend Technology">
+
+<textarea id="desc" placeholder="Project Description"></textarea>
+
+<button id="submitBtn">Submit Project</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import { 
+getFirestore,
+collection,
+addDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyCvcwHqg1NdO_VjpdJDwGSDTDF6MBziMdQ",
+
+authDomain: "studentmate-project.firebaseapp.com",
+
+projectId: "studentmate-project",
+
+storageBucket: "studentmate-project.appspot.com",
+
+messagingSenderId: "566056627066",
+
+appId: "1:566056627066:web:497b4af77d4c1eb52804c3"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+document.getElementById("submitBtn").addEventListener("click", addProject);
+
+
+async function addProject(){
+
+try{
+
+let projectName=document.getElementById("projectName").value;
+
+let deptNo=document.getElementById("deptNo").value;
+
+let guideName=document.getElementById("guideName").value;
+
+let frontendTech=document.getElementById("frontendTech").value;
+
+let backendTech=document.getElementById("backendTech").value;
+
+let desc=document.getElementById("desc").value;
+
+
+if(!projectName || !deptNo || !guideName || !frontendTech || !backendTech || !desc){
+
+alert("Please fill all fields");
+
+return;
+
+}
+
+
+await addDoc(collection(db,"projects"),{
+
+projectName:projectName,
+
+deptNo:deptNo,
+
+guideName:guideName,
+
+frontendTech:frontendTech,
+
+backendTech:backendTech,
+
+desc:desc,
+
+status:"pending"
+
+});
+
+
+document.getElementById("msg").innerText="✅ Project submitted successfully!";
+
+
+document.getElementById("projectName").value="";
+document.getElementById("deptNo").value="";
+document.getElementById("guideName").value="";
+document.getElementById("frontendTech").value="";
+document.getElementById("backendTech").value="";
+document.getElementById("desc").value="";
+
+
+}
+
+catch(error){
+
+console.error(error);
+
+document.getElementById("msg").innerText="❌ Error: "+error.message;
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
